@@ -15,13 +15,6 @@ import Graphics.D3.Util
 import Prelude(Unit(), bind, negate, (++), show, (>>=))
 import Data.Nullable
 
-type GraphData =
-  { nodes :: Array Node
-  , links :: Array Link
-  }
-
-type Node = { x :: Number, y :: Number }
-type Link = { source :: Node, target :: Node }
 
 mainD3 :: forall eff. Eff (d3 :: D3 | eff) Unit
 mainD3 = do
@@ -29,12 +22,12 @@ mainD3 = do
       canvasHeight = 500.0
 
   force <- forceLayout
-    .. size { width: canvasWidth, height: canvasHeight }
     .. charge (-400.0)
+    .. size { width: canvasWidth, height: canvasHeight }
     .. linkDistance 40.0
 
   drag <- force ... drag
-    .. onDragStart dragStartHandler
+    -- .. onDragStart dragStartHandler
 
   svg <- rootSelect "body"
     .. append "svg"
@@ -74,24 +67,22 @@ mainD3 = do
        ... attrN' "cx" _.x
         .. attrN' "cy" _.y
 
+{--}
 
-mySimpleCallback :: forall eff. Nullable String -> Eff (d3 :: D3, console :: CONSOLE | eff) Unit
+-- last remaining bits of easy FFI - some helper functions needed for some of this stuff
+mySimpleCallback    :: forall eff. Nullable String -> Eff (d3::D3,console::CONSOLE|eff) Unit
 mySimpleCallback message = log "mySimpleCallback: Purescript"
 
+dragStartHandler    :: forall eff d. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
+dragStartHandler d = log "dragStartHandler - PureScript" -- select(this).classed('fixed', d.fixed = true);
 
-
-dragStartHandler :: forall d. d -> D3Eff Unit
-dragStartHandler = ffi ["d"] "d3.select(this).classed('unmoored', d.fixed = true);"
-
-singleClickHandler :: forall d eff. d -> Eff (d3 :: D3, console :: CONSOLE | eff) Unit
+singleClickHandler  :: forall d eff. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
 singleClickHandler d = log "singleClickHandler - Purescript"
 
-doubleClickHandler :: forall d eff. d -> Eff (d3 :: D3, console :: CONSOLE | eff) Unit
-doubleClickHandler d = log "doubleClickHandler - Purescript"
+doubleClickHandler  :: forall d eff. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
+doubleClickHandler d = log "doubleClickHandler - Purescript" -- d3.select(this).classed('fixed', d.fixed = false);
 
--- doubleClickHandler :: forall d. d -> D3Eff Unit
--- doubleClickHandler = ffi ["d"] "d3.select(this).classed('fixed', d.fixed = false);"
-
+-- the grpah data tho' should be read with Purescript's Affjax and converted with generics
 toGraphData :: Foreign -> GraphData
 toGraphData = ffi ["g"] "g"
 
