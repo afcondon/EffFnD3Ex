@@ -31,8 +31,8 @@ mainD3 = do
 
   svg <- rootSelect "body"
     .. append "svg"
-    .. attrN "width" canvasWidth
-    .. attrN "height" canvasHeight
+    .. attr "width" canvasWidth
+    .. attr "height" canvasHeight
 
   json "http://localhost:8080/graph" \(Right v) -> do
     let graph = toGraphData v
@@ -45,13 +45,14 @@ mainD3 = do
     link <- svg ... selectAll ".link"
         .. bindData graph.links
       .. enter .. append "line"
-        .. attrS "class" "link"
+        .. attr "class" "link"
 
     node <- svg ... selectAll ".node"
         .. bindData graph.nodes
       .. enter .. append "circle"
-        .. attrS "class" "node"
-        .. attrN "r" 12.0
+        .. attr "class" "node"
+        .. attr "r" 12.0
+        .. attr "class" "fixed"
         .. createDrag drag
         -- .. onClick singleClickHandler
         .. onDoubleClick customDoubleClickHandler
@@ -77,7 +78,7 @@ mySimpleCallback message = log "mySimpleCallback: Purescript"
 -- foreign import customDoubleclickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
 
 singleClickHandler  :: forall d eff. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
-singleClickHandler = ffi ["d"] "d3.select(this).classed('fixed', d.fixed = true);"
+singleClickHandler = ffi ["d"] "d3.select(this).classed('fixed', d.fixed = false);"
 
 foreign import customDragStartHandler   :: forall d e r eff. d -> Eff (d3::D3|eff) (e r)
 foreign import customDoubleClickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
