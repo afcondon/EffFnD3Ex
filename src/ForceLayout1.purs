@@ -59,14 +59,14 @@ mainD3 = do
 
     force ... onTick \_ -> do
       link
-       ... attrN' "x1" (\d -> d.source.x)
-        .. attrN' "y1" (\d -> d.source.y)
-        .. attrN' "x2" (\d -> d.target.x)
-        .. attrN' "y2" (\d -> d.target.y)
+       ... attr' "x1" (\d -> d.source.x)
+        .. attr' "y1" (\d -> d.source.y)
+        .. attr' "x2" (\d -> d.target.x)
+        .. attr' "y2" (\d -> d.target.y)
 
       node
-       ... attrN' "cx" _.x
-        .. attrN' "cy" _.y
+       ... attr' "cx" _.x
+        .. attr' "cy" _.y
 
 {--}
 
