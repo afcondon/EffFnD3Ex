@@ -27,7 +27,7 @@ mainD3 = do
     .. linkDistance 40.0
 
   drag <- force ... drag
-    -- .. onDragStart dragStartHandler
+    .. onDragStart customDragStartHandler
 
   svg <- rootSelect "body"
     .. append "svg"
@@ -53,8 +53,8 @@ mainD3 = do
         .. attrS "class" "node"
         .. attrN "r" 12.0
         .. createDrag drag
-        .. onClick singleClickHandler
-        .. onDoubleClick doubleClickHandler
+        -- .. onClick singleClickHandler
+        .. onDoubleClick customDoubleClickHandler
 
     force ... onTick \_ -> do
       link
@@ -73,16 +73,19 @@ mainD3 = do
 mySimpleCallback    :: forall eff. Nullable String -> Eff (d3::D3,console::CONSOLE|eff) Unit
 mySimpleCallback message = log "mySimpleCallback: Purescript"
 
-dragStartHandler    :: forall eff d. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
-dragStartHandler d = log "dragStartHandler - PureScript" -- select(this).classed('fixed', d.fixed = true);
+-- dragStartHandler    :: forall eff d e r. d -> Eff (d3::D3,console::CONSOLE|eff) (e r)
+-- foreign import customDoubleclickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
 
 singleClickHandler  :: forall d eff. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
-singleClickHandler d = log "singleClickHandler - Purescript"
+singleClickHandler = ffi ["d"] "d3.select(this).classed('fixed', d.fixed = true);"
 
-doubleClickHandler  :: forall d eff. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
-doubleClickHandler d = log "doubleClickHandler - Purescript" -- d3.select(this).classed('fixed', d.fixed = false);
+foreign import customDragStartHandler   :: forall d e r eff. d -> Eff (d3::D3|eff) (e r)
+foreign import customDoubleClickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
 
--- the grpah data tho' should be read with Purescript's Affjax and converted with generics
+-- doubleClickHandler  :: forall d i eff. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
+-- doubleClickHandler =  ffi ["d"] "d3.selectAll(\".node\").filter(function(d) { return d.index == 10; }).classed('fixed', d.fixed = false);"
+
+-- the graph data tho' should be read with Purescript's Affjax and converted with generics
 toGraphData :: Foreign -> GraphData
 toGraphData = ffi ["g"] "g"
 
