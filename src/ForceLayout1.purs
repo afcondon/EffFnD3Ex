@@ -34,7 +34,7 @@ mainD3 = do
     .. attr "width" canvasWidth
     .. attr "height" canvasHeight
 
-  json "http://localhost:8080/graph" \(Right v) -> do
+  json "http://localhost:3000/graph" \(Right v) -> do
     let graph = toGraphData v
 
     force
@@ -54,7 +54,7 @@ mainD3 = do
         .. attr "r" 12.0
         .. attr "class" "fixed"
         .. createDrag drag
-        -- .. onClick singleClickHandler
+        .. onClick singleClickHandler
         .. onDoubleClick customDoubleClickHandler
 
     force ... onTick \_ -> do
@@ -77,8 +77,12 @@ mySimpleCallback message = log "mySimpleCallback: Purescript"
 -- dragStartHandler    :: forall eff d e r. d -> Eff (d3::D3,console::CONSOLE|eff) (e r)
 -- foreign import customDoubleclickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
 
-singleClickHandler  :: forall d eff. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
-singleClickHandler = ffi ["d"] "d3.select(this).classed('fixed', d.fixed = false);"
+singleClickHandler  :: forall a eff. (Selection a) -> Eff (d3::D3,console::CONSOLE|eff) Unit
+singleClickHandler d = log "doubleclick was called" -- (attr "r" 20.0) element
+  -- where
+  --   element =
+
+-- singleClickHandler = ffi ["d"] "d3.select(this).classed('fixed', d.fixed = false);"
 
 foreign import customDragStartHandler   :: forall d e r eff. d -> Eff (d3::D3|eff) (e r)
 foreign import customDoubleClickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
