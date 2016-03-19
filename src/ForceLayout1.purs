@@ -12,7 +12,7 @@ import Graphics.D3.Request
 import Graphics.D3.Scale
 import Graphics.D3.Selection
 import Graphics.D3.Util
-import Prelude(Unit(), bind, negate, (++), show, (>>=))
+import Prelude(Unit(), bind, negate, (++), show, (>>=), return, ($))
 import Data.Nullable
 
 
@@ -77,10 +77,12 @@ mySimpleCallback message = log "mySimpleCallback: Purescript"
 -- dragStartHandler    :: forall eff d e r. d -> Eff (d3::D3,console::CONSOLE|eff) (e r)
 -- foreign import customDoubleclickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
 
-singleClickHandler  :: forall a eff. (Selection a) -> Eff (d3::D3,console::CONSOLE|eff) Unit
-singleClickHandler d = log "doubleclick was called" -- (attr "r" 20.0) element
-  -- where
-  --   element =
+singleClickHandler  :: forall a eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
+singleClickHandler this = do
+        s <- select' this
+        attr "r" 20.0 s
+        log "well here goes nothing"
+-- (attr "r" 30.0) (select' this)
 
 -- singleClickHandler = ffi ["d"] "d3.select(this).classed('fixed', d.fixed = false);"
 
