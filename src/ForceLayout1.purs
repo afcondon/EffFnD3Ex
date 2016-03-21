@@ -12,8 +12,10 @@ import Graphics.D3.Request
 import Graphics.D3.Scale
 import Graphics.D3.Selection
 import Graphics.D3.Util
+import Graphics.D3.EffFnThis
 import Prelude(Unit(), unit,  bind, negate, (++), show, (>>=), return, ($))
 import Data.Nullable
+import Data.Tuple
 
 
 mainD3 :: forall eff. Eff (d3 :: D3, console :: CONSOLE | eff) Unit
@@ -73,22 +75,22 @@ mainD3 = do
 mySimpleCallback    :: forall eff. Nullable String -> Eff (d3::D3,console::CONSOLE|eff) Unit
 mySimpleCallback message = log "mySimpleCallback: Purescript"
 
-dragStartHandler    :: forall eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
-dragStartHandler this = do
+dragStartHandler    :: forall d eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
+dragStartHandler datum = do
       log "in the dragStartHandler"
-      s <- select' this
-        .. classed "fixed" true
+      -- s <- select' element
+      --   .. classed "fixed" true
       return unit
 
-singleClickHandler  :: forall eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
-singleClickHandler this = do
-        s <- select' this
+singleClickHandler  :: forall d eff. (ElementAndDatum d) -> Eff (d3::D3,console::CONSOLE|eff) Unit
+singleClickHandler (Tuple datum element) = do
+        s <- select' element
             .. attr "r" 20.0
         return unit
 
-doubleClickHandler  :: forall eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
-doubleClickHandler this = do
-        s <- select' this
+doubleClickHandler  :: forall d eff. (ElementAndDatum d) -> Eff (d3::D3,console::CONSOLE|eff) Unit
+doubleClickHandler (Tuple datum element) = do
+        s <- select' element
             .. attr "r" 10.0
             .. attr "fixed" false
         return unit
