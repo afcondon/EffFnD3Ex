@@ -12,7 +12,7 @@ import Graphics.D3.Request
 import Graphics.D3.Scale
 import Graphics.D3.Selection
 import Graphics.D3.Util
-import Graphics.D3.EffFnThis
+import Graphics.D3.EffFnExtra
 import Prelude(Unit(), unit,  bind, negate, (++), show, (>>=), return, ($))
 import Data.Nullable
 import Data.Tuple
@@ -75,11 +75,9 @@ mainD3 = do
 mySimpleCallback    :: forall eff. Nullable String -> Eff (d3::D3,console::CONSOLE|eff) Unit
 mySimpleCallback message = log "mySimpleCallback: Purescript"
 
-dragStartHandler    :: forall d eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
-dragStartHandler datum = do
+dragStartHandler    :: forall eff. Eff (d3::D3,console::CONSOLE|eff) Unit
+dragStartHandler = do
       log "in the dragStartHandler"
-      -- s <- select' element
-      --   .. classed "fixed" true
       return unit
 
 singleClickHandler  :: forall d eff. (ElementAndDatum d) -> Eff (d3::D3,console::CONSOLE|eff) Unit
