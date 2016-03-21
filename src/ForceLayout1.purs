@@ -9,16 +9,20 @@ import Graphics.D3.Base
 import Graphics.D3.Layout.Base
 import Graphics.D3.Layout.Force
 import Graphics.D3.Request
+import Graphics.D3.Event
 import Graphics.D3.Scale
 import Graphics.D3.Selection
 import Graphics.D3.Util
 import Graphics.D3.EffFnExtra
-import Prelude(Unit(), unit,  bind, negate, (++), show, (>>=), return, ($))
+import Prelude(Unit(), unit,  bind, negate, (++), show, (>>=), return, ($), liftM1, map)
 import Data.Nullable
 import Data.Tuple
+import Data.Maybe
+import DOM
+import DOM.Event.Event
 
 
-mainD3 :: forall eff. Eff (d3 :: D3, console :: CONSOLE | eff) Unit
+mainD3 :: forall eff. Eff (d3 :: D3, console :: CONSOLE, dom :: DOM | eff) Unit
 mainD3 = do
   let canvasWidth = 960.0
       canvasHeight = 500.0
@@ -75,9 +79,11 @@ mainD3 = do
 mySimpleCallback    :: forall eff. Nullable String -> Eff (d3::D3,console::CONSOLE|eff) Unit
 mySimpleCallback message = log "mySimpleCallback: Purescript"
 
-dragStartHandler    :: forall eff. Eff (d3::D3,console::CONSOLE|eff) Unit
+dragStartHandler    :: forall eff. Eff (d3::D3,console::CONSOLE,dom::DOM|eff) Unit
 dragStartHandler = do
       log "in the dragStartHandler"
+      ev <- currentD3Event
+      let unused = liftM1 stopImmediatePropagation ev
       return unit
 
 singleClickHandler  :: forall d eff. (ElementAndDatum d) -> Eff (d3::D3,console::CONSOLE|eff) Unit
