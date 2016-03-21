@@ -12,11 +12,11 @@ import Graphics.D3.Request
 import Graphics.D3.Scale
 import Graphics.D3.Selection
 import Graphics.D3.Util
-import Prelude(Unit(), bind, negate, (++), show, (>>=), return, ($))
+import Prelude(Unit(), unit,  bind, negate, (++), show, (>>=), return, ($))
 import Data.Nullable
 
 
-mainD3 :: forall eff. Eff (d3 :: D3 | eff) Unit
+mainD3 :: forall eff. Eff (d3 :: D3, console :: CONSOLE | eff) Unit
 mainD3 = do
   let canvasWidth = 960.0
       canvasHeight = 500.0
@@ -27,7 +27,7 @@ mainD3 = do
     .. linkDistance 40.0
 
   drag <- force ... drag
-    .. onDragStart customDragStartHandler
+    .. onDragStart dragStartHandler
 
   svg <- rootSelect "body"
     .. append "svg"
@@ -52,10 +52,9 @@ mainD3 = do
       .. enter .. append "circle"
         .. attr "class" "node"
         .. attr "r" 12.0
-        .. attr "class" "fixed"
         .. createDrag drag
         .. onClick singleClickHandler
-        .. onDoubleClick customDoubleClickHandler
+        .. onDoubleClick doubleClickHandler
 
     force ... onTick \_ -> do
       link
@@ -74,23 +73,27 @@ mainD3 = do
 mySimpleCallback    :: forall eff. Nullable String -> Eff (d3::D3,console::CONSOLE|eff) Unit
 mySimpleCallback message = log "mySimpleCallback: Purescript"
 
--- dragStartHandler    :: forall eff d e r. d -> Eff (d3::D3,console::CONSOLE|eff) (e r)
--- foreign import customDoubleclickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
+dragStartHandler    :: forall eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
+dragStartHandler this = do
+      log "in the dragStartHandler"
+      s <- select' this
+        .. classed "fixed" true
+      return unit
 
-singleClickHandler  :: forall a eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
+singleClickHandler  :: forall eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
 singleClickHandler this = do
         s <- select' this
-        attr "r" 20.0 s
-        log "well here goes nothing"
--- (attr "r" 30.0) (select' this)
+            .. attr "r" 20.0
+        return unit
 
--- singleClickHandler = ffi ["d"] "d3.select(this).classed('fixed', d.fixed = false);"
+doubleClickHandler  :: forall eff. D3Element -> Eff (d3::D3,console::CONSOLE|eff) Unit
+doubleClickHandler this = do
+        s <- select' this
+            .. attr "r" 10.0
+            .. attr "fixed" false
+        return unit
 
-foreign import customDragStartHandler   :: forall d e r eff. d -> Eff (d3::D3|eff) (e r)
-foreign import customDoubleClickHandler :: forall d eff. d -> Eff (d3::D3|eff) Unit
-
--- doubleClickHandler  :: forall d i eff. d -> Eff (d3::D3,console::CONSOLE|eff) Unit
--- doubleClickHandler =  ffi ["d"] "d3.selectAll(\".node\").filter(function(d) { return d.index == 10; }).classed('fixed', d.fixed = false);"
+-- foreign import customDragStartHandler   :: forall d e r eff. d -> Eff (d3::D3|eff) (e r)
 
 -- the graph data tho' should be read with Purescript's Affjax and converted with generics
 toGraphData :: Foreign -> GraphData
