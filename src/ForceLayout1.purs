@@ -75,11 +75,13 @@ mainD3 = do
        ... attr' "cx" _.x
         .. attr' "cy" _.y
 
-{--}
-
--- last remaining bits of easy FFI - some helper functions needed for some of this stuff
 mySimpleCallback    :: forall eff. Nullable String -> Eff (d3::D3,console::CONSOLE|eff) Unit
 mySimpleCallback message = log "mySimpleCallback: Purescript"
+
+
+-- Event propagation is a complicated business - see this Stack Overflow when it's time
+-- to get this right:
+-- http://stackoverflow.com/questions/19931307/d3-differentiate-between-click-and-drag-for-an-element-which-has-a-drag-behavior
 
 dragStartHandler    :: forall eff. Eff (d3::D3,console::CONSOLE,dom::DOM|eff) Unit
 dragStartHandler = do
