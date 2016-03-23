@@ -18,8 +18,10 @@ import Prelude(Unit(), unit,  bind, negate, (++), show, (>>=), return, ($), lift
 import Data.Nullable
 import Data.Tuple
 import Data.Maybe
+import Data.Traversable
 import DOM
 import DOM.Event.Event
+import DOM.Event.Types
 
 
 mainD3 :: forall eff. Eff (d3 :: D3, console :: CONSOLE, dom :: DOM | eff) Unit
@@ -82,18 +84,26 @@ mySimpleCallback message = log "mySimpleCallback: Purescript"
 dragStartHandler    :: forall eff. Eff (d3::D3,console::CONSOLE,dom::DOM|eff) Unit
 dragStartHandler = do
       log "in the dragStartHandler"
-      ev <- currentD3Event
-      let unused = liftM1 stopImmediatePropagation ev
+      mev <- currentD3Event
+      u   <- case mev of
+             (Just e) -> stopPropagation e
       return unit
 
 singleClickHandler  :: forall d eff. (ElementAndDatum d) -> Eff (d3::D3,console::CONSOLE|eff) Unit
 singleClickHandler (Tuple datum element) = do
-        s <- select' element
-            .. attr "r" 20.0
+        log "in the singleClickHandler"
+        mev <- currentD3Event
+        let prevented = case mev of
+                     (Just e) -> defaultPrevented e
+                     Nothing  -> false
+        let effect = case prevented of
+                 false -> select' element
+                          .. attr "r" 20.0
         return unit
 
 doubleClickHandler  :: forall d eff. (ElementAndDatum d) -> Eff (d3::D3,console::CONSOLE|eff) Unit
 doubleClickHandler (Tuple datum element) = do
+        log "in the doubleClickHandler"
         s <- select' element
             .. attr "r" 10.0
             .. attr "fixed" false
