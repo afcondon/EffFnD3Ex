@@ -91,24 +91,35 @@ dragStartHandler = do
              (Just e) -> stopPropagation e
       return unit
 
-singleClickHandler  :: forall d eff. (ElementAndDatum d) -> Eff (d3::D3,console::CONSOLE|eff) Unit
-singleClickHandler (Tuple datum element) = do
+
+-- | this is just an inline hack to show the idea, in a more comprehensive example the data would be defined
+-- | elsewhere and the accessors necessary would be defined there too
+type Node = { index :: Number, fixed :: Number, weight :: Number, px :: Number, py :: Number, cx :: Number, cy :: Number }
+foreign import setFixed   :: forall eff. Node -> Eff (d3::D3|eff) Unit
+foreign import unsetFixed :: forall eff. Node -> Eff (d3::D3|eff) Unit
+
+singleClickHandler  :: forall eff. (ElementAndDatum Node) -> Eff (d3::D3,console::CONSOLE|eff) Unit
+singleClickHandler (Tuple d element) = do
         log "in the singleClickHandler"
-        mev <- currentD3Event
-        let prevented = case mev of
-                     (Just e) -> defaultPrevented e
-                     Nothing  -> false
-        let effect = case prevented of
-                 false -> select' element
-                          .. attr "r" 20.0
+        setFixed d
+        s <- select' element
+            .. attr "r" 20.0
+            .. classed "fixed" true
+        -- mev <- currentD3Event
+        -- let prevented = case mev of
+        --              (Just e) -> defaultPrevented e
+        --              Nothing  -> false
+        -- let effect = case prevented of
+        --          false -> select' element
+        --                   .. attr "r" 20.0
         return unit
 
-doubleClickHandler  :: forall d eff. (ElementAndDatum d) -> Eff (d3::D3,console::CONSOLE|eff) Unit
-doubleClickHandler (Tuple datum element) = do
+doubleClickHandler  :: forall eff. (ElementAndDatum Node) -> Eff (d3::D3,console::CONSOLE|eff) Unit
+doubleClickHandler (Tuple d element) = do
         log "in the doubleClickHandler"
+        unsetFixed d
         s <- select' element
             .. attr "r" 10.0
-            .. attr "fixed" false
         return unit
 
 -- the graph data tho' should be read with Purescript's Affjax and converted with generics
