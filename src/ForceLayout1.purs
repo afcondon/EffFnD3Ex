@@ -111,8 +111,6 @@ doubleClickHandler (Tuple datum element) = do
             .. attr "fixed" false
         return unit
 
--- foreign import customDragStartHandler   :: forall d e r eff. d -> Eff (d3::D3|eff) (e r)
-
 -- the graph data tho' should be read with Purescript's Affjax and converted with generics
 toGraphData :: Foreign -> GraphData
 toGraphData = ffi ["g"] "g"
